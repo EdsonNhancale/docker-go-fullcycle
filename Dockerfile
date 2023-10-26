@@ -1,13 +1,13 @@
-FROM golang:1.4-alpine AS builder
+FROM golang:1.8 AS builder
 
 WORKDIR /go/src/app
 
-COPY ./ ./
+COPY main.go ./
 
-RUN go build -o /server
+#build the binary with debug information removed
+RUN go build -ldflags '-w -s' -a -installsuffix cgo -o /server
 
-FROM alpine:2.6
-WORKDIR /
+FROM scratch
 COPY --from=0 /server /server
 EXPOSE 8000
-ENTRYPOINT ["/server"]
+ENTRYPOINT ["./server"]
